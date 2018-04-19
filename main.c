@@ -5,8 +5,8 @@
 #define max_bound 5
 
 int p[max_bound][max_bound]; //玩家的位置
-int wi[max_bound-1][max_bound-1]; //表示擺縱方向的wall
-int wj[max_bound-1][max_bound-1]; //表示擺橫方向的wall
+int wi[max_bound][max_bound]; //表示擺縱方向的wall
+int wj[max_bound][max_bound]; //表示擺橫方向的wall
 char buff[max_bound*2+1][max_bound*3+1];//输出缓冲器//当前光标位置
 int Now=1;//当前走子的玩家，1代表黑，2代表白
 int count;//回合数
