@@ -5,8 +5,8 @@
 #define max_bound 5
 
 int p[max_bound][max_bound]; //玩家的位置
-int wi[max_bound-1][max_bound-1]; //表示擺縱方向的wall
-int wj[max_bound-1][max_bound-1]; //表示擺橫方向的wall
+int wi[max_bound][max_bound]; //表示擺縱方向的wall
+int wj[max_bound][max_bound]; //表示擺橫方向的wall
 char buff[max_bound*2+1][max_bound*3+1];//输出缓冲器//当前光标位置
 int Now=1;//当前走子的玩家，1代表黑，2代表白
 int count;//回合数
@@ -44,6 +44,8 @@ int Initial(){
 	return 0;
 }
 
+
+
 int find_pos(int who, int wch){
 	int i,j;
 	for (i=0; i<max_bound; i++){
@@ -62,7 +64,12 @@ int find_pos(int who, int wch){
 	
 }
 
-int getstyle(i,j){
+int flip(int i){
+	return (i==1)?2:1;
+}
+
+int getstyle(int i,int j){
+
 	if(p[(i-1)/2][(j-2)/4]==1 && (i-1)%2==0 && (j-2)%4==0 ){ 			//print玩家1位置
 		printf("1");
 	}
@@ -91,11 +98,36 @@ int getstyle(i,j){
 }
 
 int Display(){
-	int i,j=0;
+	int i=0;
+	int j=0;
+	int c;
+	
+	for(c=1;c<=max_bound;c++){  //print out the index (12345)
+		printf("  %d ",c);
+		if(c==max_bound){
+			printf("\n");
+		}
+	}
+
 	while(i<=max_bound*2){
 		while(j<=max_bound*4){
 			getstyle(i,j);
 			j++;
+		}
+		if(i==1){				//print out the index (abcde)
+			printf(" A");
+		}
+		if(i==3){
+			printf(" B");
+		}
+		if(i==5){
+			printf(" C");
+		}
+		if(i==7){
+			printf(" D");
+		}
+		if(i==9){
+			printf(" E");
 		}
 		printf("\n");
 		j=0;
@@ -106,7 +138,8 @@ int Display(){
 
 int step_allowed(int i,int j){
 	int u1,v1,u2,v2;	//the previous step (u,v) -> (i,j)
-	int m,n=0;
+	int m=0;
+	int n=0;
 	
 	if(i<0||j<0||i>max_bound-1||j>max_bound-1){		//----step that is out-of-bound is not allowed
 		return 0;
@@ -127,9 +160,9 @@ int step_allowed(int i,int j){
 		v1=find_pos(2,2);
 		v2=find_pos(1,2);
 	}
-	printf("%d %d %d %d",u1,v1,u2,v2);
+	printf("%d %d %d %d\n",u1,v1,u2,v2);
 
-	if(i==u2 && j==v2){					//-----不可重疊
+	if((i==u2 && j==v2 )|| (i==u1 && j==v1 )){					//-----不可重疊(neither opponent nor self)
 		return 0;
 	}
 
@@ -184,14 +217,128 @@ int step_allowed(int i,int j){
 		return 1;
 	}
 
-	return -1;
-	
+	if( (wi[i][j]==1 || wi[u1][v1]==1) || (wj[i][j]==1 || wj[u1][v1]==1) ){
+		return 0;
+	}
 
+	return -1;
+}
+
+int write_piece(){
+	char in[2];
+	char temp[10];
+	int i;
+	int j;
+	int cnt=0;
+	
+	while(1){
+
+		while(1){		//check the length is proper or not
+
+		printf("Please enter the index to indicate where to move:\n");
+		scanf(" %s", temp);
+		if(strlen(temp)!=2){
+			printf("wrong input!\n");
+		}
+		else{
+			in[0]=temp[0];
+			in[1]=temp[1];
+			break;
+		}
+	}
+	
+		if(strlen(temp)==2){		//check the elements are proper or not
+		
+			if(in[0]=='A'||in[0]=='a'){
+				i=0;
+				cnt++;
+			}
+			if(in[0]=='B'||in[0]=='b'){
+				i=1;
+				cnt++;
+			}
+			if(in[0]=='C'||in[0]=='c'){
+				i=2;
+				cnt++;
+			}
+			if(in[0]=='D'||in[0]=='d'){
+				i=3;
+				cnt++;
+			}
+			if(in[0]=='E'||in[0]=='e'){
+				i=4;
+				cnt++;
+			}
+			if(in[1]=='1'){
+				j=0;
+				cnt++;
+			}
+			if(in[1]=='2'){
+				j=1;
+				cnt++;
+			}
+			if(in[1]=='3'){
+				j=2;
+				cnt++;
+			}
+			if(in[1]=='4'){
+				j=3;
+				cnt++;
+			}
+			if(in[1]=='5'){
+				j=4;
+				cnt++;
+			}
+			if(cnt==2 && step_allowed(i,j)==1){				//check whether the move follows the rules
+				p[find_pos(Now,1)][find_pos(Now,2)]=0;		//if fullfill all condition update the position
+				p[i][j]=Now;
+				Now=flip(Now);
+				break;
+			}
+			else{
+				cnt=0;
+				printf("wrong input!\n");
+			}
+
+		}
+		if(p[i][j]=1 && cnt==2){
+			break;
+		}
+		
+	}
+}
+
+
+
+int input(){
+	char In;
+	printf("                                  player %d's turn\n",Now);
+	printf("*********************************\n");
+	printf("| PLACE THE WALL     ---press p |\n");
+	printf("| MOVE THE PIECE        press m |\n");
+	printf("*********************************\n");
+	while(1){
+		scanf(" %c",&In);
+		if(In=='m'){
+			write_piece();
+			break;
+		}
+		if(In=='p'){
+		//	write_wall();
+			break;
+		}
+		else{
+			printf("command error please enter again");
+		}
+	}
+	
 }
 
 int main (void){
 	Initial();
-	Display();
-	printf("%d",step_allowed(1,0));
+	while(1){
+		Display();
+		input();
+	}
 	return 0;
 }
