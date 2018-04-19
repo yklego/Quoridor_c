@@ -301,11 +301,12 @@ int write_piece(){
 			}
 
 		}
-		if(p[i][j]=1 && cnt==2){
+		if(p[i][j]==1 && cnt==2){
 			break;
 		}
 		
 	}
+	return 0;
 }
 
 
@@ -331,7 +332,7 @@ int input(){
 			printf("command error please enter again");
 		}
 	}
-	
+	return 0;
 }
 
 int main (void){
