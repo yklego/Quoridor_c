@@ -166,6 +166,26 @@ int flip(int i){
 	return (i==1)?2:1;
 }
 
+int winthegame(){
+	if(Now==1){						//Determined the condtion that player 1 win the game
+		if(find_pos(Now,2)==4){
+			return 1;
+		}
+		else{
+			return 0;
+		}
+	}
+	if(Now==2){
+		if(find_pos(Now,2)==0){		//for player 2
+			return 2;
+		}
+		else{
+			return 0;
+		}
+	}
+	return 0;
+}
+
 
 int getstyle(int i,int j){
 
@@ -275,10 +295,22 @@ int step_allowed(int i,int j){
 		}
 		
 		if(u2==i && abs(j-v1)==1 && u2-u1>0 && (wj[u2][v2]==1 || u2==max_bound-1)){  //往下 落地點遭牆阻擋的情況	*** 如果又遭阻擋
+			if(j-v1==-1 && wi[i][j]==1){  //left going
+				return 0;
+			}
+			if(j-v1==1 && wi[u2][v2]==1){ 	//right going
+				return 0;
+			}		
 			return 1;
 		}
 
 		if(u2==i && abs(j-v1)==1 && u2-u1<0 && (wj[u2-1][v2]==1 || u2==0)){	//往上 落地點遭阻擋的情況
+			if(j-v1==-1 && wi[i][j]==1){  //left going
+				return 0;
+			}
+			if(j-v1==1 && wi[u2][v2]==1){ 	//right going
+				return 0;
+			}
 			return 1;
 		}
 	}
@@ -294,10 +326,22 @@ int step_allowed(int i,int j){
 		}
 		
 		if(v2==j && abs(i-u1)==1 && v2-v1>0 && (wi[u2][v2]==1|| v2==max_bound-1)){  //往右 落地點遭牆阻擋的情況  *** 如果又遭阻擋
+			if(i-u1==-1 && wj[i][j]==1){  //up going
+				return 0;
+			}
+			if(i-u1==1 && wj[u2][v2]==1){ 	//down going
+				return 0;
+			}
 			return 1;
 		}
 
 		if(v2==j && abs(i-u1)==1 && v2-v1<0 && (wi[u2][v2-1]==1 || v2==0)){	//往左 落地點遭阻擋的情況
+			if(i-u1==-1 && wj[i][j]==1){  //up going
+				return 0;
+			}
+			if(i-u1==1 && wj[u2][v2]==1){ 	//down going
+				return 0;
+			}
 			return 1;
 		}	
 	
@@ -688,7 +732,6 @@ int write_piece(){
 			if(cnt==2 && step_allowed(i,j)==1){				//check whether the move follows the rules
 				p[find_pos(Now,1)][find_pos(Now,2)]=0;		//if fullfill all condition update the position
 				p[i][j]=Now;
-				Now=flip(Now);
 				break;
 			}
 			else{
@@ -855,7 +898,6 @@ int write_wall(){
 				wi[i][j]=1;
 				wi[i+1][j]=1;
 				numwall[Now-1]+=1;
-				Now=flip(Now);
 				cnt=0;
 				break;
 			}
@@ -863,7 +905,6 @@ int write_wall(){
 				wj[i][j]=1;
 				wj[i][j+1]=1;
 				numwall[Now-1]+=1;
-				Now=flip(Now);
 				cnt=0;
 				break;
 			}
@@ -919,12 +960,21 @@ int main (void){
 	welcome();
 	while(1){
 		InitialTheGame();
-		wi[2][0]=1;
-		wi[1][0]=1;
-		wi[0][0]=1;
+		InitialDeway();
+		InitialTheStack();
 		while(1){
 			Display();
 			input();
+			if(winthegame()){
+				printf("\n");
+				printf("**************************\n");
+				printf("*       GAME OVER        *\n");
+				printf("*      PLAYER %d WIN!     *\n",Now);
+				printf("**************************\n");
+				printf("\n");
+				break;
+			}
+			Now=flip(Now);
 		}
 		Exit();
 	}
